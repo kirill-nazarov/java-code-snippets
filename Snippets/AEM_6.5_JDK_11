@@ -1,0 +1,20 @@
+JDK 11 causes NoClassDefFoundError AEM 6.5
+
+Issue
+The error below is observed in the logs after upgrading to Java 11 with AEM 6.5.x.
+
+15.09.2020 00:30:20.868 *ERROR* [FelixStartLevel] org.apache.sling.scripting.sightly bundle org.apache.sling.scripting.sightly:1.1.2.1_4_0 (557)[org.apache.sling.scripting.sightly.impl.engine.extension.use.JavaUseProvider(3410)] :  Error during instantiation of the implementation object (java.lang.NoClassDefFoundError: jdk/internal/reflect/ConstructorAccessorImpl)
+java.lang.NoClassDefFoundError: jdk/internal/reflect/ConstructorAccessorImpl
+    at java.base/jdk.internal.misc.Unsafe.defineClass0(Native Method)
+
+Solution
+This issue is due to the fact that CXF packages have been removed from AEM and you have to install those externally.
+
+Stop AEM
+Find and open this file in a text editor: crx-quickstart/conf/sling.properties
+Modify this line:
+Before:
+org.osgi.framework.bootdelegation=com.yourkit.*, ${org.apache.sling.launcher.bootdelegation}
+After:
+org.osgi.framework.bootdelegation=sun.*,com.sun.*,jdk.internal.reflect,jdk.internal.reflect.*,com.yourkit.*,${org.apache.sling.launcher.bootdelegation}
+4. Start AEM
